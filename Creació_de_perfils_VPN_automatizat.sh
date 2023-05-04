@@ -6,7 +6,7 @@ read nom
 
 # Verificar que la entrada solo contenga letras y números
 if [[ $nom =~ ^[a-zA-Z0-9]+$ ]]; then
-    echo "La entrada es válida: $entrada"
+    echo "La entrada es válida: $nom"
 else
     echo "La entrada no es válida. Solo se permiten letras y números sin espacios ni caracteres especiales."
 fi
