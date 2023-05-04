@@ -26,7 +26,7 @@ EOF
 	echo "Root Successful"
 	cd /root/ && pwd
 	sudo cp /root/$nom.ovpn /home/.openvpn && echo "Copy Successful"
-	sudo chown noti-fi /home/.openvpn/$nom.ovpn && echo "Change Ownership Successf"
+	sudo chown noti-fi /home/.openvpn/$nom.ovpn && echo "Change Ownership Successful"
 	echo "Mostrando contenido de /home/.openvpn:"
 	ls -la /home/.openvpn
 	exit
