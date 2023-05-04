@@ -2,7 +2,7 @@
 cd /home/noti-fi
 
 echo "Introduce el nombre del archivo"
-read nom
+nom="$1"
 
 # Verificar que la entrada solo contenga letras y números
 if [[ $nom =~ ^[a-zA-Z0-9]+$ ]]; then
