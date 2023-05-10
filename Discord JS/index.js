@@ -8,18 +8,20 @@ const client = new Discord.Client();
 
 const prefix = "!"
 
+const roles = ["1100403917424168984", "1099418331167064224  "]
+
 client.on('ready', () => {
 	console.log(`Bot encendido ${client.user.tag}!`);
 });
 
 client.on('message', message => {
-if(message.content.includes("ping")) {
+if(message.content.includes("ping") && !message.author.bot) {
 	message.reply("pong");
 }
 });
 
 client.on("message", message => {
-if(message.content.toLocaleLowerCase().startsWith(prefix + "help") || message.content.toLocaleLowerCase().startsWith(prefix + "h")) {
+if(message.content.toLocaleLowerCase().startsWith(prefix + "help") && !message.author.bot || message.content.toLocaleLowerCase().startsWith(prefix + "h") && !message.author.bot) {
 	const embed = new Discord.MessageEmbed()
     .setTitle("Noti-Fi Tec Help")
     .setThumbnail(client.user.displayAvatarURL())
@@ -42,16 +44,20 @@ client.on("message", async message => {
 
   const argslista = message.content.slice(10).trim();
 
-  if (message.content.startsWith(prefix + "makecert") && argslista.split('').some(c => !lista.includes(c.toLowerCase()))) {
+  if (message.content.startsWith(prefix + "makecert") && argslista.split('').some(c => !lista.includes(c.toLowerCase())) && !message.author.bot) {
     message.reply("The specified name contains special characters, the name must use A-Z letters or/and 0-9 numbers.");
     return;
   }
 
-  if(message.content.startsWith(prefix + "makecert") && !message.member.roles.cache.has("1099418331167064224")) {
-    message.reply("You don't have permissions to execute this command.").then(msg => msg.delete({timeout: 15000}))
+  if(message.content.startsWith(prefix + "makecert") && !roles.some(role => message.member.roles.cache.get(role)) && !message.author.bot) {
+    message.reply("You don't have permissions to execute this command.")
   }
 
-  else if(message.content.startsWith(prefix + "makecert") && message.content.length >= 11 && message.member.roles.cache.has("1099418331167064224")) {
+  if(message.content.startsWith(prefix + "makecert") && !message.channel.name.includes("ticket")) {
+    message.reply("To execute this command you must be in a ticket. <#1099418332375023762>")
+  }
+
+  else if(message.content.startsWith(prefix + "makecert") && message.content.length >= 11 && roles.some(role => message.member.roles.cache.get(role)) && !message.author.bot) {
     const args = message.content.slice(10).trim().split(' ');
     exec(`bash /home/ubuntu/notifitec/ssh.sh ${args[0]}`, (err, stdout, stderr) => {
       if (err) {
@@ -79,7 +85,7 @@ client.on("message", async message => {
       }
       })
   })
-  } else if(message.content.startsWith(prefix + "makecert") && message.content.length <= 10 && message.member.roles.cache.has("1099418331167064224")) {
+  } else if(message.content.startsWith(prefix + "makecert") && message.content.length <= 10 && roles.some(role => message.member.roles.cache.get(role)) && !message.author.bot) {
     message.reply("You must specify a name for the certificate after the command ``!makecert **yourname**``")
     .then(msg => msg.delete({timeout: 30000}));
   }
@@ -91,22 +97,26 @@ client.on("message", async message => {
   'y','z','0','1','2','3','4','5','6','7','8','9'];
   const argslista = message.content.slice(9).trim();
 
-  if (message.content.startsWith(prefix + "getcert") && argslista.split('').some(c => !lista.includes(c.toLowerCase()))) {
+  if (message.content.startsWith(prefix + "getcert") && argslista.split('').some(c => !lista.includes(c.toLowerCase())) && !message.author.bot && roles.some(role => message.member.roles.cache.get(role))) {
     message.reply("The specified name contains special characters, the name must use A-Z letters or/and 0-9 numbers.")
       .then(msg => msg.delete({timeout: 30000}));
     return;
   }
 
-  if(message.content.startsWith(prefix + "getcert") && !message.member.roles.cache.has("1099418331167064224")) {
+  if(message.content.startsWith(prefix + "getcert") && !roles.some(role => message.member.roles.cache.get(role)) && !message.author.bot) {
     message.reply("You don't have permissions to execute this command.").then(msg => msg.delete({timeout: 15000}))
   }
 
-  if(message.content.startsWith(prefix + "getcert") && message.content.length <= 9 && message.member.roles.cache.has("1099418331167064224")) {
+  if(message.content.startsWith(prefix + "getcert") && message.content.length <= 9 && roles.some(role => message.member.roles.cache.get(role)) && !message.author.bot) {
     message.reply("You must specify a name for the certificate after the command ``!getcert **yourname**``")
     .then(msg => msg.delete({timeout: 30000}));
   }
 
-  else if(message.content.startsWith(prefix + "getcert") && message.content.length >= 10 && message.member.roles.cache.has("1099418331167064224")) {
+  if(message.content.startsWith(prefix + "getcert") && !message.channel.name.includes("ticket")) {
+    message.reply("To execute this command you must be in a ticket. <#1099418332375023762>")
+  }
+  
+  else if(message.content.startsWith(prefix + "getcert") && message.content.length >= 10 && roles.some(role => message.member.roles.cache.get(role)) && !message.author.bot) {
     const args = message.content.slice(9).trim().split(' ');
     exec(`bash /home/ubuntu/notifitec/get.sh ${args[0]}`, (err, stdout, stderr) => {
       if (err) {
@@ -148,7 +158,7 @@ client.on("guildMemberAdd", member => {
 
 // EMBEDS //
 client.on("message", message => {
-  if(message.content.startsWith(prefix + "rules") && message.member.hasPermission("ADMINISTRATOR")) {
+  if(message.content.startsWith(prefix + "rules") && roles.some(role => message.member.roles.cache.get(role)) && !message.author.bot) {
     const embed = new Discord.MessageEmbed()
       .setTitle("Rules")
       .setThumbnail(client.user.displayAvatarURL())
@@ -180,10 +190,9 @@ client.on("message", message => {
       )
       .setColor("#ffffff")
       .setFooter("Noti-Fi Tec");
-    message.channel.send(embed2)
-          
+    message.channel.send(embed2)  
   }
-  if(message.content.startsWith(prefix + "faq") && message.member.hasPermission("ADMINISTRATOR")) {
+  if(message.content.startsWith(prefix + "faq") && roles.some(role => message.member.roles.cache.get(role)) && !message.author.bot) {
     const embed = new Discord.MessageEmbed()
       .setTitle("Frequest Asked Questions")
       .setThumbnail(client.user.displayAvatarURL())
@@ -208,7 +217,7 @@ client.on("message", message => {
 // EMBED CREATOR //
 client.on("message", message => {
   const args = message.content.slice(7).trim().split(' - ');
-  if(message.content.toLocaleLowerCase().startsWith(prefix + "embed") && message.member.roles.cache.has("1099418331167064224") || message.content.toLocaleLowerCase().startsWith(prefix + "embed") && message.member.hasPermission("ADMINISTRATOR")) {
+  if(message.content.toLocaleLowerCase().startsWith(prefix + "embed") && !message.author.bot && roles.some(role => message.member.roles.cache.get(role))) {
     message.delete()
     const embed = new Discord.MessageEmbed()
       .setTitle("Announcement")
@@ -225,15 +234,73 @@ client.on("message", message => {
     }
 });
 
-// DELETE MESSAGES // //NO HECHO AÚN//
+// DELETE MESSAGES //
 client.on("message", message => {
   const args = message.content.slice(prefix.length).trim().split(' ')
-  if(message.content.startsWith(prefix + "delete") && message.member.hasPermission("ADMINISTRATOR")) {
+  if(message.content.startsWith(prefix + "delete") && message.member.hasPermission("ADMINISTRATOR") && !message.author.bot ) {
   try {
-    message.channel.bulkDelete(parseInt(args[0]))
+    message.channel.bulkDelete(parseInt(args[1])).then(console.log(`${args[1]} messages deleted in #${message.channel.name}!`))
   } catch (err) {
     console.log(err)
+  }}
+});
+
+client.on("message", message => {
+  if(message.content.toLocaleLowerCase().startsWith(prefix + "shelp") && !message.author.bot && roles.some(role => message.member.roles.cache.get(role))) {
+    if(message.content.toLocaleLowerCase().endsWith("makecert")) {
+      message.reply(`${prefix}makecert **your name** <--- | __alphanumeric__ |`)
+    }
+    if(message.content.toLocaleLowerCase().endsWith("getcert")) {
+      message.reply(`${prefix}getcert **your name** <--- | __alphanumeric__ |`)
+    }
+    if(message.content.toLocaleLowerCase().endsWith("delete")) {
+      message.reply(`${prefix}delete **number** <--- | __2-99__ __The messages to delete can't be older than 14 days__ |`)
+    }
+    if(message.content.toLocaleLowerCase().endsWith("rules")) {
+      message.reply(`${prefix}rules`)
+    }
+    if(message.content.toLocaleLowerCase().endsWith("faq")) {
+      message.reply(`${prefix}faq`)
+    }
+    if(message.content.toLocaleLowerCase().endsWith("embed")) {
+      message.reply(`${prefix}embed **title - description/anouncement** \nExample: \`\`!embed Update 2.0 - We're doing this announcement to communicate you that we're launching the Noti-Fi Tec doorbell 2.0, soon will be available in our online shop.\`\`\nIt's important to separate the title and description with space-dash-space, like in the example (\`\` - \`\`)`)
+    }
+    else if(message.content.toLocaleLowerCase().endsWith("shelp")) {
+    const embed = new Discord.MessageEmbed()
+    .setTitle("Staff commands")
+    .setDescription("The staff/moderation commands")
+    .addFields(
+      { name: `${prefix}makecert __name__`, value: "Create a OpenVPN certificate to access the company system network."},
+      { name: `${prefix}getcert __name__`, value: "Get an existing OpenVPN certificate to access the company system network."},
+      { name: `${prefix}delete __number__`, value: "Delete the specified amount of messages in the channel you execute the command."},
+      { name: `${prefix}rules`, value: "Make the bot send the Rules embed"},
+      { name: `${prefix}embed __title__ - __description/anouncement__`},
+      { name: `${prefix}faq`, value: "Make the bot send the FAQ embed"},
+      )
+    .setThumbnail(client.user.displayAvatarURL())
+    .setColor("ffffff")
+    .setFooter(`${prefix}help command name for more info`)
+    .setTimestamp(new Date().toLocaleString("ES-es"))
+    message.channel.send(embed)
+    }
   }
+});
+
+client.on("message", message => {
+  if(message.content.toLocaleLowerCase().startsWith(prefix + "commands")) {
+    message.reply("No user commands yet.")
+  }
+});
+
+client.on("message", message => {
+  if(message.content.toLocaleLowerCase().startsWith(prefix + "website")) {
+    message.reply("This is our website: <https://noti-fi.ddns.net>")
+  }
+  
+// 300 LINES //
+
+  if(message.content.toLocaleLowerCase().startsWith(prefix + "github")) {
+    message.reply("This is our github page: <https://github.com/edusagnier/Noti-fi-Tec.>")
   }
 });
 
