@@ -8,7 +8,7 @@ const client = new Discord.Client();
 
 const prefix = "!"
 
-const roles = ["1100403917424168984", "1099418331167064224  "]
+const roles = ["1100403917424168984", "1099418331167064224"]
 
 client.on('ready', () => {
 	console.log(`Bot encendido ${client.user.tag}!`);
@@ -288,7 +288,19 @@ client.on("message", message => {
 
 client.on("message", message => {
   if(message.content.toLocaleLowerCase().startsWith(prefix + "commands")) {
-    message.reply("No user commands yet.")
+    const embed = new Discord.MessageEmbed()
+    .setTitle("Commands")
+    .setDescription("Server commands")
+    .addFields(
+      { name: `${prefix}help`, value: "Get info about ways to get help."},
+      { name: `${prefix}website`, value: "Get the link of our website."},
+      { name: `${prefix}github`, value: "Get de link of our Github repository."},
+      )
+    .setThumbnail(client.user.displayAvatarURL())
+    .setColor("ffffff")
+    .setFooter(`Developed by Noti-Fi Tec`)
+    .setTimestamp(new Date().toLocaleString("ES-es"))
+  message.channel.send(embed)
   }
 });
 
