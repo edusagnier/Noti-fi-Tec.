@@ -10,6 +10,8 @@ const prefix = "!"
 
 const roles = ["1100403917424168984", "1099418331167064224"]
 
+require('events').EventEmitter.defaultMaxListeners = 100;
+
 client.on('ready', () => {
 	console.log(`Bot encendido ${client.user.tag}!`);
 });
@@ -195,7 +197,7 @@ client.on("message", message => {
   }
   if(message.content.startsWith(prefix + "faq") && roles.some(role => message.member.roles.cache.get(role)) && !message.author.bot) {
     const embed = new Discord.MessageEmbed()
-      .setTitle("Frequest Asked Questions")
+      .setTitle("Frequent Asked Questions")
       .setThumbnail(client.user.displayAvatarURL())
       .setDescription("Some of the most Frequent Asked Questions")
       .addFields(
@@ -280,7 +282,7 @@ client.on("message", message => {
       )
     .setThumbnail(client.user.displayAvatarURL())
     .setColor("ffffff")
-    .setFooter(`${prefix}help command name for more info`)
+    .setFooter(`${prefix}shelp command name for more info`)
     .setTimestamp(new Date().toLocaleString("ES-es"))
     message.channel.send(embed)
     }
